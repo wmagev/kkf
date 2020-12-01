@@ -1,0 +1,9 @@
+._inventory_custom_meta {
+    text-align: right;
+    width: 30%;
+    margin: 5px 0;
+    float: left;
+}
+._invetory_meta_container {
+    min-height: 200px;
+}
