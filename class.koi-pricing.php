@@ -1,19 +1,47 @@
 <?php
 class KoiPricing {
     private static $initiated = false;
+    const INV_POST_TYPE = 'inventory';
+    const TERM_START_DATE = '__term_start_date';
+    const TERM_END_DATE = '__term_end_date';
+    const TERM_PHOTO_DATE = '__term_photo_date';
+    public static $post_statues = [
+        'to_review' => 'To Review',
+        'reviewed' => 'Reviewed',
+        'deployed' => 'Deployed',
+        'live' => 'Live',
+        'sold' => 'Sold',
+        'unsold' => 'Unsold',
+        'cancelled' => 'Cancelled',
+    ];
 
     public static function init() {
-		if ( ! self::$initiated ) {
-            self::init_hooks();
+        if ( ! self::$initiated ) {            
             self::init_post_type();
+            self::init_taxonomy();
+            self::init_taxonomy_meta_data();
+            self::init_post_statues();
+            self::init_hooks();
 		}
     }
     private static function init_hooks() {
-        self::$initiated = true;
+        self::$initiated = true;        
     }
 
-    private static function init_post_type() {
-        
+    private static function init_post_statues() {
+        foreach(self::$post_statues as $key => $label) {
+            register_post_status( $key, array(
+                'label'                     => _x( $label, 'post' ),
+                'public'                    => true,
+                'show_in_admin_all_list'    => false,
+                'show_in_admin_status_list' => true,
+                'label_count'               => _n_noop( $label.' <span class="count">(%s)</span>', $label.' <span class="count">(%s)</span>' )
+            ) );
+        }
+    }
+    
+
+    private static function init_post_type() {        
         $labels = array(
             'name'                  => _x( 'Inventories', 'Post Type General Name', 'inventory' ),
             'singular_name'         => _x( 'Inventory', 'Post Type Singular Name', 'inventory' ),
@@ -63,5 +91,79 @@ class KoiPricing {
             'capability_type'       => 'page',
         );
         register_post_type( 'inventory', $args );   
+    }
+    private static function init_taxonomy() {
+        $labels = array(
+            'name' => _x( 'Auction Groups', 'taxonomy general name' ),
+            'singular_name' => _x( 'Auction Group', 'taxonomy singular name' ),
+            'search_items' =>  __( 'Search Auction Groups' ),
+            'all_items' => __( 'All Auction Groups' ),
+            'parent_item' => __( 'Parent Auction Group' ),
+            'parent_item_colon' => __( 'Parent Auction Group:' ),
+            'edit_item' => __( 'Edit Auction Group' ), 
+            'update_item' => __( 'Update Auction Group' ),
+            'add_new_item' => __( 'Add New Auction Group' ),
+            'new_item_name' => __( 'New Auction Group Name' ),
+            'menu_name' => __( 'Auction Groups' ),
+          );    
+         
+        // Now register the taxonomy
+        register_taxonomy('auction_groups', 
+            array('inventory'), 
+            array(
+                'hierarchical' => true,
+                'labels' => $labels,
+                'show_ui' => true,
+                'show_in_rest' => true,
+                'show_admin_column' => true,
+                'query_var' => true,
+                'rewrite' => array( 'slug' => 'auction_group' ),
+            )
+        );
+
+        
+
+        $labels = array(
+            'name' => _x( 'Photo Groups', 'taxonomy general name' ),
+            'singular_name' => _x( 'Photo Group', 'taxonomy singular name' ),
+            'search_items' =>  __( 'Search Photo Groups' ),
+            'popular_items' => __( 'Popular Photo Groups' ),
+            'all_items' => __( 'All Photo Groups' ),
+            'parent_item' => null,
+            'parent_item_colon' => null,
+            'edit_item' => __( 'Edit Photo Group' ), 
+            'update_item' => __( 'Update Photo Group' ),
+            'add_new_item' => __( 'Add New Photo Group' ),
+            'new_item_name' => __( 'New Photo Group Name' ),
+            'separate_items_with_commas' => __( 'Separate photo groups with commas' ),
+            'add_or_remove_items' => __( 'Add or remove photo groups' ),
+            'choose_from_most_used' => __( 'Choose from the most used photo groups' ),
+            'menu_name' => __( 'Photo Groups' ),
+          ); 
+         
+        // Now register the non-hierarchical taxonomy like tag
+         
+        register_taxonomy('photo_groups',
+            'inventory',
+            array(
+                'hierarchical' => false,
+                'labels' => $labels,
+                'show_ui' => true,
+                'show_in_rest' => true,
+                'show_admin_column' => true,
+                'update_count_callback' => '_update_post_term_count',
+                'query_var' => true,
+                'rewrite' => array( 'slug' => 'photo_group' ),
+            )
+        );
+    }
+
+    private static function init_taxonomy_meta_data() {
+        // Auction Group
+        register_meta( 'term', self::TERM_START_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
+        register_meta( 'term', self::TERM_END_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
+
+        // Photo Group
+        register_meta( 'term', self::TERM_PHOTO_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
     }
 }
