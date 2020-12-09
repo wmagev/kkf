@@ -5,7 +5,7 @@ class KoiPricing {
     const TERM_START_DATE = '__term_start_date';
     const TERM_END_DATE = '__term_end_date';
     const TERM_PHOTO_DATE = '__term_photo_date';
-    public static $post_statues = [
+    public static $post_statuses = [
         'to_review' => 'To Review',
         'reviewed' => 'Reviewed',
         'deployed' => 'Deployed',
@@ -17,19 +17,19 @@ class KoiPricing {
 
     public static function init() {
         if ( ! self::$initiated ) {            
-            self::init_post_type();
-            self::init_taxonomy();
-            self::init_taxonomy_meta_data();
-            self::init_post_statues();
             self::init_hooks();
 		}
     }
     private static function init_hooks() {
-        self::$initiated = true;        
+        self::$initiated = true;
+        add_action('product_taxonomies_added', array( 'KoiPricing', 'init_post_type' ) );        
+        add_action('inventory_post_type_added', array( 'KoiPricing', 'init_taxonomy' ) );
+        add_action('inventory_post_type_added', array( 'KoiPricing', 'init_taxonomy_meta_data' ) );
+        add_action('inventory_post_type_added', array( 'KoiPricing', 'init_post_statuses' ) );
     }
 
-    private static function init_post_statues() {
-        foreach(self::$post_statues as $key => $label) {
+    public static function init_post_statuses() {
+        foreach(self::$post_statuses as $key => $label) {
             register_post_status( $key, array(
                 'label'                     => _x( $label, 'post' ),
                 'public'                    => true,
@@ -41,7 +41,7 @@ class KoiPricing {
     }
     
 
-    private static function init_post_type() {        
+    public static function init_post_type() {        
         $labels = array(
             'name'                  => _x( 'Inventories', 'Post Type General Name', 'inventory' ),
             'singular_name'         => _x( 'Inventory', 'Post Type Singular Name', 'inventory' ),
@@ -76,7 +76,7 @@ class KoiPricing {
             'description'           => __( 'Inventory Description', 'inventory' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'editor', 'thumbnail', 'comments', 'custom-fields' ),
-            'taxonomies'            => array( 'category', 'post_tag' ),
+            'taxonomies'            => array( 'post_tag', 'breeder', 'variety', 'price_type', 'product_cat' ),
             'hierarchical'          => false,
             'public'                => true,
             'show_ui'               => true,
@@ -90,9 +90,12 @@ class KoiPricing {
             'publicly_queryable'    => true,
             'capability_type'       => 'page',
         );
-        register_post_type( 'inventory', $args );   
+        register_post_type( 'inventory', $args );
+
+        do_action( 'inventory_post_type_added' ); //Register taxnomoies after post_type added
+        
     }
-    private static function init_taxonomy() {
+    public static function init_taxonomy() {
         $labels = array(
             'name' => _x( 'Auction Groups', 'taxonomy general name' ),
             'singular_name' => _x( 'Auction Group', 'taxonomy singular name' ),
@@ -156,14 +159,28 @@ class KoiPricing {
                 'rewrite' => array( 'slug' => 'photo_group' ),
             )
         );
+        error_log("Term Inserting for WF_INVENTORY FOLDERS");
+        wp_insert_term( 'Auction Group', 'wf_inventory_folders', array(
+            'parent' => "0",
+        ) );
+        wp_insert_term( 'Photo Group', 'wf_inventory_folders', array(
+            'parent' => "0",
+        ) );
     }
 
-    private static function init_taxonomy_meta_data() {
+    public static function init_taxonomy_meta_data() {
         // Auction Group
         register_meta( 'term', self::TERM_START_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
         register_meta( 'term', self::TERM_END_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
 
         // Photo Group
         register_meta( 'term', self::TERM_PHOTO_DATE, array( 'KoiPricing_Admin', 'sanitize_term_meta_text' ) );
+    }
+
+    public static function plugin_activation() {
+
+        
+        
+
     }
 }

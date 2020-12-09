@@ -65,8 +65,9 @@ class KoiPricing_Admin {
         global $post;
         $arg = get_query_var( 'post_status' );
         
-        if(!array_key_exists($arg, KoiPricing::$post_statues)){
-            return array(KoiPricing::$post_statues[$post->post_status]);
+        if(!array_key_exists($arg, KoiPricing::$post_statuses)){
+            if(isset(KoiPricing::$post_statuses[$post->post_status]))
+                return array(KoiPricing::$post_statuses[$post->post_status]);
         }
         return $states;
     }
@@ -81,12 +82,12 @@ class KoiPricing_Admin {
                 <script>
                 jQuery(document).ready(function($){
             ';
-            foreach(KoiPricing::$post_statues as $status_key => $status_label) {
+            foreach(KoiPricing::$post_statuses as $status_key => $status_label) {
                 $complete = '';
                 error_log($post->post_status);
-                if(array_key_exists($post->post_status, KoiPricing::$post_statues)){
+                if(array_key_exists($post->post_status, KoiPricing::$post_statuses)){
                     $complete = " selected='selected'";
-                    $label = KoiPricing::$post_statues[$post->post_status];
+                    $label = KoiPricing::$post_statuses[$post->post_status];
                     error_log($label." is selected!");
                 }
                 echo '
@@ -111,10 +112,10 @@ class KoiPricing_Admin {
     }
     public static function inventory_add_custom_box() {
         add_meta_box(
-            'inventory_box_id',                 // Unique ID
+            'inventory_box_id',         // Unique ID
             'Inventory Meta Data',      // Box title
-            array( 'KoiPricing_Admin', 'inventory_meta_box_html' ),  // Content callback, must be of type callable
-            'inventory'                            // Post type
+            array( 'KoiPricing_Admin', 'inventory_meta_box_html' ),     // Content callback, must be of type callable
+            'inventory'                 // Post type
         );    
     }
 
@@ -154,12 +155,7 @@ class KoiPricing_Admin {
         }
     }
 
-    public static function enqueue_admin_script( $hook ) {
-        
-        // if ( 'post.php' != $hook ) {
-        //     return;
-        // }
-
+    public static function enqueue_admin_script( $hook ) {       
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script( 'koi_admin_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-script.js', array(), '1.0' );
         wp_register_style( 'koi_admin_css', plugin_dir_url( __FILE__ ) . 'assets/css/admin-style.css', false, '1.0.0' );
@@ -244,10 +240,9 @@ class KoiPricing_Admin {
 
 
     public static function save_auction_group_meta( $term_id ) {
-
         foreach (
             [
-                KoiPricing::TERM_START_DATE, 
+                KoiPricing::TERM_START_DATE,
                 KoiPricing::TERM_END_DATE
             ] as $meta_key
         ) 
@@ -296,7 +291,6 @@ class KoiPricing_Admin {
 
         else if ( $old_value !== $new_value )
             update_term_meta( $term_id, $meta_key, $new_value );
-        error_log($meta_key.' -> '.$new_value);
     }
     
 }

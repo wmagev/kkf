@@ -7,3 +7,142 @@
 ._invetory_meta_container {
     min-height: 200px;
 }
+.koi-pricing-table-filter {
+    box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    margin-top: 40px;
+    padding: 30px;
+    box-sizing: border-box;
+    position: relative;
+    width: 99%;
+    display: flex;
+}
+
+.koi-pricing-table-filter .button {
+    background-color: #6c7ae0; /* Green */
+    border: 1px solid #6c7ae0;
+    color: white;
+    padding: 5px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.koi-pricing-table-filter .button:hover {
+    color: #6c7ae0;
+    background-color: #ececff;
+}
+.koi-pricing-table-filter .input-box {
+    position: relative;
+    width: fit-content;
+}
+.koi-pricing-table-filter input {
+    margin: 0 1px;
+    border: 0;
+    padding: 7px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.koi-pricing-table-filter input:focus {
+    outline: none;
+}
+
+.koi-pricing-table-filter input ~ .focus-border {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: #3399FF;
+    transition: 0.4s;
+}
+
+.koi-pricing-table-filter input:focus ~ .focus-border {
+    width: 100%;
+    transition: 0.4s;
+    left: 0;
+}
+
+.koi-pricing-table-filter div.input-wrapper.first {
+    border-left: none;
+}
+.koi-pricing-table-filter div.input-wrapper {
+    float: left;
+    padding: 0 10px;    
+    border-left: 1px solid #ddd;
+    flex: 1;
+}
+.koi-pricing-table-filter .vl {
+    border-left: 6px solid green;
+    height: 500px;
+}
+.koi-pricing-table-filter h2 {
+    background: #eee;
+    display: block;
+    position: absolute;
+    top: -27px;
+    padding: 0 15px;    
+}
+.koi-pricing-table-wrapper {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.2);
+    width: 99%;
+}
+.koi-pricing-table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;    
+}
+  
+.koi-pricing-table td, .koi-pricing-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.koi-pricing-table tr{
+    background-color: #fff;
+}
+
+.koi-pricing-table tr:hover {
+    background-color: #ececff;
+}
+
+.koi-pricing-table th {
+    padding: 18px 0 12px 0;
+    text-align: center;
+    background-color: #6c7ae0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: normal;
+}
+.koi-pricing-table td.name {
+    text-align: center;
+}
+
+.koi-pricing-table .child-table {
+    width: 100%;
+}
+
+.koi-pricing-table .child-table tr {
+    background-color: transparent;
+}
+
+.koi-pricing-table .child-table td {
+    border: none;
+    padding: 0;
+}
+
+.koi-pricing-table .child-table td:first-child {
+    text-align: right;
+    padding-right: 15px;
+    width: 50%;
+}
+.koi-pricing-table td.pricing .child-table td:first-child {
+    width: 75%;
+}
+.toplevel_page_koi-pricing .notice-success, .toplevel_page_koi-pricing div.updated, .toplevel_page_koi-pricing div.update-nag {
+    display: none;
+}
+

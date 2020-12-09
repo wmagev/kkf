@@ -12,14 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'KOI_PRICING__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
-// register_activation_hook( __FILE__, array( 'KoiPricing', 'plugin_activation' ) );
+register_activation_hook( __FILE__, array( 'KoiPricing', 'plugin_activation' ) );
 // register_deactivation_hook( __FILE__, array( 'KoiPricing', 'plugin_deactivation' ) );
 
 require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing.php' );
+require_once( KOI_PRICING__PLUGIN_DIR . 'class.shortcodes.php' );
 
 add_action( 'init', array( 'KoiPricing', 'init' ) );
+add_action( 'init', array( 'KoiShortcodes', 'init' ) );
 
 if ( is_admin() ) {
 	require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing-admin.php' );
+	require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing-admin-page.php' );
 	add_action( 'init', array( 'KoiPricing_Admin', 'init' ) );
+	add_action( 'init', array( 'KoiPricing_Admin_Page', 'init' ) );
 }
