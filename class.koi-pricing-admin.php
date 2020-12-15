@@ -59,7 +59,18 @@ class KoiPricing_Admin {
         
     }
 
-    
+    public static function enqueue_admin_script( $hook ) {       
+        wp_enqueue_script('jquery-ui-datepicker');
+        wp_enqueue_script( 'koi_admin_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-script.js', array(), '1.0' );
+        wp_localize_script( 'koi_admin_script', 'admin_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+
+        wp_enqueue_script( 'koi_admin_lightbox_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-lightbox.js', array(), '1.0' );
+
+        wp_register_style( 'koi_admin_lightbox_style', plugin_dir_url( __FILE__ ) . 'assets/css/admin-lightbox.css', false, '1.0.0' );
+        wp_register_style( 'koi_admin_style', plugin_dir_url( __FILE__ ) . 'assets/css/admin-style.css', false, '1.0.0' );
+        wp_enqueue_style( 'koi_admin_style' );
+        wp_enqueue_style( 'koi_admin_lightbox_style' );
+    }    
 
     public static function inventory_display_state( $states ) {
         global $post;
@@ -83,12 +94,11 @@ class KoiPricing_Admin {
                 jQuery(document).ready(function($){
             ';
             foreach(KoiPricing::$post_statuses as $status_key => $status_label) {
-                $complete = '';
-                error_log($post->post_status);
+                $complete = '';                
                 if(array_key_exists($post->post_status, KoiPricing::$post_statuses)){
                     $complete = " selected='selected'";
                     $label = KoiPricing::$post_statuses[$post->post_status];
-                    error_log($label." is selected!");
+                
                 }
                 echo '
                     $("select#post_status").append("<option value=\"'.$status_key.'\" '.$complete.'>'.$status_label.'</option>");
@@ -154,14 +164,7 @@ class KoiPricing_Admin {
             }
         }
     }
-
-    public static function enqueue_admin_script( $hook ) {       
-        wp_enqueue_script('jquery-ui-datepicker');
-        wp_enqueue_script( 'koi_admin_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-script.js', array(), '1.0' );
-        wp_register_style( 'koi_admin_css', plugin_dir_url( __FILE__ ) . 'assets/css/admin-style.css', false, '1.0.0' );
-        wp_enqueue_style( 'koi_admin_css' );
-    }
-
+    
     public static function sanitize_term_meta_text ( $value ) {
         return sanitize_text_field ($value);
     }
@@ -176,12 +179,12 @@ class KoiPricing_Admin {
         <?php wp_nonce_field( basename( __FILE__ ), 'term_start_date_nonce' ); ?>
         <div class="form-field term-start-date-wrap">
             <label for="term-start-date"><?php _e( 'Start Date', 'start_date' ); ?></label>
-            <input type="text" name="<?= KoiPricing::TERM_START_DATE ?>" id="term-start-date" value="" class="term-start-date-field" />
+            <input type="text" name="<?= KoiPricing::TERM_START_DATE ?>" id="term-start-date" value="" class="term-start-date-field datepicker" />
         </div>
         <?php wp_nonce_field( basename( __FILE__ ), 'term_end_date_nonce' ); ?>
         <div class="form-field term-end-date-wrap">
             <label for="term-end-date"><?php _e( 'End Date', 'end_date' ); ?></label>
-            <input type="text" name="<?= KoiPricing::TERM_END_DATE ?>" id="term-end-date" value="" class="term-end-date-field" />
+            <input type="text" name="<?= KoiPricing::TERM_END_DATE ?>" id="term-end-date" value="" class="term-end-date-field datepicker" />
         </div>
     <?php }
 
@@ -209,14 +212,14 @@ class KoiPricing_Admin {
             <th scope="row"><label for="term-start-date"><?php _e( 'Start Date', 'start_date' ); ?></label></th>
             <td>
                 <?php wp_nonce_field( basename( __FILE__ ), 'term_start_date_nonce' ); ?>
-                <input type="text" name="<?= KoiPricing::TERM_START_DATE ?>" id="term-start-date" value="<?php echo esc_attr( $start_date ); ?>" class="term-start-date-field"  />
+                <input type="text" name="<?= KoiPricing::TERM_START_DATE ?>" id="term-start-date" value="<?php echo esc_attr( $start_date ); ?>" class="term-start-date-field datepicker"  />
             </td>
         </tr>
         <tr class="form-field term-end-date-wrap">
             <th scope="row"><label for="term-end-date"><?php _e( 'End Date', 'end_date' ); ?></label></th>
             <td>
                 <?php wp_nonce_field( basename( __FILE__ ), 'term_end_date_nonce' ); ?>
-                <input type="text" name="<?= KoiPricing::TERM_END_DATE ?>" id="term-end-date" value="<?php echo esc_attr( $end_date ); ?>" class="term-end-date-field"  />
+                <input type="text" name="<?= KoiPricing::TERM_END_DATE ?>" id="term-end-date" value="<?php echo esc_attr( $end_date ); ?>" class="term-end-date-field datepicker"  />
             </td>
         </tr>
     <?php }

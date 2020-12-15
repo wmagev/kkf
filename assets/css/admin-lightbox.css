@@ -1,0 +1,154 @@
+.koi-thumbnails img {
+  border: 3px solid transparent;
+}
+.koi-thumbnails img:hover {
+  cursor: pointer;
+  border: 3px solid #FF69B4;
+}
+
+.koi-pricing-table .thumbnail {  
+  text-align: left;
+}
+
+.koi-pricing-table .inventory-title {
+  clear: both;  
+}
+
+.koi-pricing-table .thumbnail .koi-thumbnails:not(:first-child) {
+  float: left;
+  margin-right: 2px;
+}
+
+.koi-pricing-table .thumbnail .koi-thumbnails:first-child {
+  width: 100%;
+}
+
+.row > .column {
+  padding: 0 8px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Create four equal columns that floats next to eachother */
+.column {
+  float: left;
+  width: 25%;
+}
+
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    z-index: 100000;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: black;
+  }
+  
+  /* Modal Content */
+.lightbox-modal .modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  width: 90%;
+  max-width: 1200px;
+}
+
+/* The Close Button */
+.lightbox-modal .close {
+  color: white;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.lightbox-modal .close:hover,
+.lightbox-modal .close:focus {
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Hide the slides by default */
+.lightbox-modal .koi-slides {
+  display: none;
+}
+
+/* Next & previous buttons */
+.lightbox-modal .prev,
+.lightbox-modal .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -50px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Position the "next button" to the right */
+.lightbox-modal .next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.lightbox-modal .prev:hover,
+.lightbox-modal .next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Number text (1/3 etc) */
+.lightbox-modal .numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* Caption text */
+.lightbox-modal .caption-container {
+  text-align: center;
+  background-color: black;
+  padding: 2px 16px;
+  color: white;
+}
+
+.lightbox-modal img {
+  display: block;
+  margin: 0 auto;
+}
+
+.lightbox-modal img.demo {
+  opacity: 0.6;
+}
+
+.lightbox-modal .active,
+.lightbox-modal .demo:hover {
+  opacity: 1;
+}
+
+.lightbox-modal img.hover-shadow {
+  transition: 0.3s;
+}
+
+.lightbox-modal .hover-shadow:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

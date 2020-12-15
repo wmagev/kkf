@@ -24,6 +24,9 @@ add_action( 'init', array( 'KoiShortcodes', 'init' ) );
 if ( is_admin() ) {
 	require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing-admin.php' );
 	require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing-admin-page.php' );
+	require_once( KOI_PRICING__PLUGIN_DIR . 'class.koi-pricing-ajax-handler.php' );
+
 	add_action( 'init', array( 'KoiPricing_Admin', 'init' ) );
 	add_action( 'init', array( 'KoiPricing_Admin_Page', 'init' ) );
+	add_action( 'init', array( 'KoiPricing_AjaxHandler', 'init' ) );
 }

@@ -7,15 +7,82 @@
 ._invetory_meta_container {
     min-height: 200px;
 }
+.koi-pricing-title {
+    margin: 0 auto;
+    padding: 40px 0;
+    display: block;
+    width: fit-content;
+}
+.koi-container {
+    display: flex;
+}
+.koi-sidebar {
+    flex: 1;
+    margin: 0 20px 0 10px;
+    box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;    
+}
+.koi-main {
+    flex: 4;
+}
+.koi-sidebar i.fas {
+    margin-right: 10px;
+}
+.koi-sidebar .accordion {
+    font-size: 20px;
+    background-color: #6c7ae0;
+    color: #fff;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    border-bottom: 2px solid #fff;
+    outline: none;
+    transition: 0.4s;
+}
+.koi-sidebar .panel ul {
+    margin: 0;
+}
+.koi-sidebar .panel ul li span{
+    float: right;
+}
+.koi-sidebar .panel ul li:hover,
+.koi-sidebar .panel ul li.hover
+{
+    background: #ececff;
+}
+
+.koi-sidebar .panel ul li {
+    font-size: 16px;
+    padding: 20px;
+    border-bottom: 1px solid #6c7ae0;
+}
+
+/* .koi-sidebar .active,  */
+.koi-sidebar .accordion:hover
+{
+    background-color: #ececff;
+    color: #000;
+}
+
+.koi-sidebar .panel {    
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
 .koi-pricing-table-filter {
     box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px;
-    margin-top: 40px;
     padding: 30px;
     box-sizing: border-box;
     position: relative;
     width: 99%;
     display: flex;
+    border-radius: 10px;
 }
 
 .koi-pricing-table-filter .button {
@@ -117,7 +184,9 @@
     font-size: 16px;
     font-weight: normal;
 }
-.koi-pricing-table td.name {
+.koi-pricing-table td.name,
+.koi-pricing-table td.drag-n-drop
+{
     text-align: center;
 }
 
@@ -142,7 +211,80 @@
 .koi-pricing-table td.pricing .child-table td:first-child {
     width: 75%;
 }
-.toplevel_page_koi-pricing .notice-success, .toplevel_page_koi-pricing div.updated, .toplevel_page_koi-pricing div.update-nag {
+.toplevel_page_koi-pricing .notice-success,
+.toplevel_page_koi-pricing div.updated,
+.toplevel_page_koi-pricing div.update-nag {
     display: none;
 }
 
+.koi-pricing-notification {
+    padding: 20px;
+    /* background-color: #f44336; */
+    background: #4CAF50;
+    color: white;    
+    margin: 0 15px 15px;
+}
+
+.koi-pricing-notification .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.koi-pricing-notification .closebtn:hover {
+    color: black;
+}
+
+.pagination {
+    background: #6c7ae0;
+    border: 2px solid #6c7ae0;
+    width: fit-content;
+    margin: 0 auto;
+}
+  
+.pagination a {
+    color: #fff;
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+.pagination a:hover {
+    background-color: #ececff;
+    color: #000;
+    cursor: pointer;
+}
+.pagination a:focus {
+    box-shadow: 0 0 0 1px #fff, 0 0 2px 1px #fff;
+}
+
+.current-filter-info {
+    margin: 0 15px 15px;
+}
+.current-filter-info .filter-field {
+    font-weight: 700;    
+}
+.current-filter-info .refresh-filter {
+    background: #FF69B4;
+    width: 20px;
+    height: 19px;
+    text-align: center;
+    display: inline-block;
+    border-radius: 50%;
+    color: #fff;
+    margin-left: 10px;
+}
+.current-filter-info .refresh-filter:hover {
+    background: #f50a7f;
+}
+
+.current-filter-info span.filter-value {
+    padding: 0 5px;
+    margin-right: 5px;
+    background: #6c7ae0;
+    color: #fff;
+}
