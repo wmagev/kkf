@@ -43,7 +43,7 @@ class KoiPricing_Admin_Page {
                     <div class="panel">
                         <ul>
                             <?php foreach($auction_groups as $term): ?>
-                                <li class="taxonomy-term-list-item" id="<?= $term->term_id ?>" data-term-id="<?= $term->term_id ?>" data-taxonomy="auction_groups"><i class="fas fa-list-alt"></i><?= $term->name ?><span class="term-count" ><?= $term->count ?></span></li>
+                                <li class="taxonomy-term-list-item" id="<?= $term->term_id ?>" data-term-id="<?= $term->term_id ?>" data-taxonomy="auction_groups"><i class="fas fa-list-alt"></i><?= $term->name ?><span class="term-count" ><?= $term->count ?></span><span class="auction-reorder" data-term-name="<?= $term->name ?>" data-term-id="<?= $term->term_id ?>">Reorder</span></li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -52,7 +52,7 @@ class KoiPricing_Admin_Page {
                     <div class="panel">
                         <ul>
                             <?php foreach($photo_groups as $term): ?>
-                                <li class="taxonomy-term-list-item" id="<?= $term->name ?>" data-term-id="<?= $term->term_id ?>" data-taxonomy="photo_groups"><i class="fas fa-list-alt"></i><?= $term->name ?><span class="term-count" ><?= $term->count ?></span></li>
+                                <li class="taxonomy-term-list-item" id="<?= $term->slug ?>" data-term-id="<?= $term->term_id ?>" data-taxonomy="photo_groups"><i class="fas fa-list-alt"></i><?= $term->name ?><span class="term-count" ><?= $term->count ?></span></li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -83,6 +83,7 @@ class KoiPricing_Admin_Page {
                 </div>                
             </div>
             <?php echo do_shortcode( '[koi-thumbnail-lightbox]' ); ?>
+            <?php echo do_shortcode( '[koi-reorder-auction]' ); ?>
 		<?php
     }
 }

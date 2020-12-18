@@ -85,7 +85,9 @@
     border-radius: 10px;
 }
 
-.koi-pricing-table-filter .button {
+.koi-pricing-table-filter .button,
+.auction-reorder-modal .button
+{
     background-color: #6c7ae0; /* Green */
     border: 1px solid #6c7ae0;
     color: white;
@@ -95,8 +97,15 @@
     display: inline-block;
     font-size: 16px;
 }
-
-.koi-pricing-table-filter .button:hover {
+.auction-reorder-modal .button {
+    border: 1px solid #fff;
+}
+.auction-reorder-modal .button:hover {
+    color: #6c7ae0;
+    background-color: #fff;
+}
+.koi-pricing-table-filter .button:hover
+{
     color: #6c7ae0;
     background-color: #ececff;
 }
@@ -115,6 +124,10 @@
     outline: none;
 }
 
+.koi-pricing-table-filter input:disabled {
+
+}
+
 .koi-pricing-table-filter input ~ .focus-border {
     position: absolute;
     bottom: 0;
@@ -129,6 +142,10 @@
     width: 100%;
     transition: 0.4s;
     left: 0;
+}
+
+.koi-pricing-table-filter div.input-wrapper select {
+    border: none;
 }
 
 .koi-pricing-table-filter div.input-wrapper.first {
@@ -265,8 +282,15 @@
 .current-filter-info {
     margin: 0 15px 15px;
 }
+.current-filter-info .filter-field-wrapper {
+    border: 1px solid #6c7ae0;
+    background-color: #ececff;
+    padding: 5px;
+    margin: 3px;
+    display: inline-block;
+}
 .current-filter-info .filter-field {
-    font-weight: 700;    
+    
 }
 .current-filter-info .refresh-filter {
     background: #FF69B4;
@@ -282,9 +306,23 @@
     background: #f50a7f;
 }
 
-.current-filter-info span.filter-value {
-    padding: 0 5px;
-    margin-right: 5px;
-    background: #6c7ae0;
-    color: #fff;
+.current-filter-info span.filter-value {    
+    margin-right: 5px;    
+    color: #000;
+    font-weight: 500;
 }
+
+.auction-reorder {
+    color: blue;
+    font-size: 12px;
+    margin-right: 8px;
+}
+
+.auction-reorder:hover {
+    cursor: pointer;
+}
+
+.koi-pricing-api-key-field {
+    width: 30%;
+}
+

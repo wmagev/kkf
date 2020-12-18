@@ -36,6 +36,8 @@ class KoiPricing_Admin {
         add_action( 'admin_footer-post.php', array( 'KoiPricing_Admin', 'inventory_append_post_status_list' ) );
         add_filter( 'display_post_states', array( 'KoiPricing_Admin', 'inventory_display_state' ) );
 
+        add_action( 'admin_menu', array( 'KoiPricing_Admin', 'init_settings_page' ) );
+        add_action( 'admin_init', array( 'KoiPricing_Admin', 'init_register_settings' ) );
         // Taxonomy Meta Data Hooks
         // -- Auction Group Taxonomy Meta
         add_action( 'auction_groups_add_form_fields', array( 'KoiPricing_Admin', 'add_form_field_auction_group_meta' ) );
@@ -56,7 +58,6 @@ class KoiPricing_Admin {
 
         add_filter( 'manage_edit-photo_groups_columns', array( 'KoiPricing_Admin', 'edit_photo_group_meta_columns'), 10, 3 );
         add_filter( 'manage_photo_groups_custom_column', array( 'KoiPricing_Admin', 'manage_tax_meta_custom_column'), 10, 3 );
-        
     }
 
     public static function enqueue_admin_script( $hook ) {       
@@ -64,13 +65,83 @@ class KoiPricing_Admin {
         wp_enqueue_script( 'koi_admin_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-script.js', array(), '1.0' );
         wp_localize_script( 'koi_admin_script', 'admin_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
 
+        wp_enqueue_script( 'koi_admin_reorder_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-auction-reorder.js', array(), '1.0' );
+        wp_localize_script( 'koi_admin_reorder_script', 'admin_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+
         wp_enqueue_script( 'koi_admin_lightbox_script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-lightbox.js', array(), '1.0' );
 
         wp_register_style( 'koi_admin_lightbox_style', plugin_dir_url( __FILE__ ) . 'assets/css/admin-lightbox.css', false, '1.0.0' );
+        wp_register_style( 'koi_admin_auction_reorder', plugin_dir_url( __FILE__ ) . 'assets/css/admin-auction-reorder.css', false, '1.0.0' );
         wp_register_style( 'koi_admin_style', plugin_dir_url( __FILE__ ) . 'assets/css/admin-style.css', false, '1.0.0' );
         wp_enqueue_style( 'koi_admin_style' );
+        wp_enqueue_style( 'koi_admin_auction_reorder' );
         wp_enqueue_style( 'koi_admin_lightbox_style' );
-    }    
+    }
+
+    public static function init_settings_page() {
+        add_options_page(
+            'Koi Pricing',
+            'Koi Pricing',
+            'manage_options',
+            'koi-pricing-setting',
+            array( 'KoiPricing_Admin', 'koi_pricing_render_plugin_settings_page' )
+        );
+    }
+
+    public static function init_register_settings() {
+        register_setting( 'koi_pricing_plugin_options', 'koi_pricing_plugin_options',  array( 'KoiPricing_Admin', 'koi_pricing_plugin_options_validate') );
+        add_settings_section( 'api_settings', 'API Settings', array( 'KoiPricing_Admin', 'koi_plugin_section_text'), 'koi_pricing_plugin' );
+    
+        add_settings_field( 'koi_plugin_setting_production_domain', 'Production Domain',  array( 'KoiPricing_Admin', 'koi_plugin_setting_production_domain' ), 'koi_pricing_plugin', 'api_settings' );
+        add_settings_field( 'koi_plugin_setting_consumer_key', 'Consumer Key',  array( 'KoiPricing_Admin', 'koi_plugin_setting_consumer_key' ), 'koi_pricing_plugin', 'api_settings' );
+        add_settings_field( 'koi_plugin_setting_consumer_secret', 'Consumer Secret',  array( 'KoiPricing_Admin', 'koi_plugin_setting_consumer_secret' ), 'koi_pricing_plugin', 'api_settings' );
+        
+    }
+    public static function koi_pricing_plugin_options_validate( $input ) {
+        // $newinput['consumer_key'] = trim( $input['consumer_key'] );
+        // if ( ! preg_match( '/^[a-z0-9]{32}$/i', $newinput['consumer_key'] ) ) {
+        //     $newinput['consumer_key'] = '';
+        // }
+
+        // $newinput['consumer_secret'] = trim( $input['consumer_secret'] );
+        // if ( ! preg_match( '/^[a-z0-9]{32}$/i', $newinput['consumer_secret'] ) ) {
+        //     $newinput['consumer_secret'] = '';
+        // }
+        // return $newinput;
+        return $input;
+    }
+
+    public static function koi_plugin_section_text() {
+        echo '<p>Here you can set all the options for using the API</p>';
+    }
+
+    public static function koi_plugin_setting_production_domain() {
+        $options = get_option( 'koi_pricing_plugin_options' );
+        echo "<input id='koi_plugin_setting_production_domain' class='koi-pricing-api-key-field' name='koi_pricing_plugin_options[production_domain]' type='text' value='".esc_attr( $options['production_domain'] )."' />";
+    }
+    
+    public static function koi_plugin_setting_consumer_key() {
+        $options = get_option( 'koi_pricing_plugin_options' );
+        echo "<input id='koi_plugin_setting_consumer_key' class='koi-pricing-api-key-field' name='koi_pricing_plugin_options[consumer_key]' type='text' value='".esc_attr( $options['consumer_key'] )."' />";
+    }
+
+    public static function koi_plugin_setting_consumer_secret() {
+        $options = get_option( 'koi_pricing_plugin_options' );
+        echo "<input id='koi_plugin_setting_consumer_secret' class='koi-pricing-api-key-field' name='koi_pricing_plugin_options[consumer_secret]' type='text' value='".esc_attr( $options['consumer_secret'] )."' />";
+    }
+
+    public static function koi_pricing_render_plugin_settings_page() {
+        ?>
+        <h2>Koi Pricing Live Site API setting</h2>
+        <form action="options.php" method="post">
+            <?php 
+                settings_fields( 'koi_pricing_plugin_options' );
+                do_settings_sections( 'koi_pricing_plugin' ); 
+            ?>
+            <input name="submit" class="button button-primary koi-pricing-setting" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
+        </form>
+        <?php
+    }
 
     public static function inventory_display_state( $states ) {
         global $post;
@@ -294,6 +365,10 @@ class KoiPricing_Admin {
 
         else if ( $old_value !== $new_value )
             update_term_meta( $term_id, $meta_key, $new_value );
+    }
+
+    public static function get_meta_lable_by_key($meta_key) {
+        return self::$inventory_meta_data[$meta_key];
     }
     
 }

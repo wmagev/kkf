@@ -1,7 +1,9 @@
 jQuery(document).ready(function() {
     jQuery('.datepicker').datepicker()
     jQuery('.filter-submit').click(submitFilter)
+    jQuery('.button.koi-pricing-setting').click(submitAPIKey)
 });
+
 const init_refresh_filter = () => {
     const refreshFilter = document.getElementById("refresh-filter")
     refreshFilter.addEventListener("click", refreshFilterListener)
@@ -22,9 +24,9 @@ const init_dragndrop = () => {
 
     const auction_group_items = document.getElementsByClassName("taxonomy-term-list-item")
     for(let i=0; i<auction_group_items.length; i++) {
-        auction_group_items[i].addEventListener("dragenter", inventoryDragEnterHandler)
-        auction_group_items[i].addEventListener("dragleave", inventoryDragLeaveHandler)
-        auction_group_items[i].addEventListener("dragover", inventoryDragOverHandler)
+        auction_group_items[i].addEventListener("dragenter", dragEnterHandler)
+        auction_group_items[i].addEventListener("dragleave", dragLeaveHandler)
+        auction_group_items[i].addEventListener("dragover", dragOverHandler)
         auction_group_items[i].addEventListener("drop", inventoryDropHandler)
         auction_group_items[i].addEventListener("click", termClickHandler)
     }
@@ -33,11 +35,6 @@ const getKoiTableBody = () => document.getElementById('koi-pricing-table-body')
 const getPaginationContainer = () => document.getElementById('koi-pricing-pagination')
 const getActiveFilterContainer = () => document.getElementById('current-filter-info')
 
-const setHTMLContent = (element, htmlContent) => {
-    htmlContent = (htmlContent === '') ? '<span style="padding: 10px">No Results</span>' : htmlContent
-    element.innerHTML = htmlContent
-    init_event_listeners()
-}
 const refreshFilterListener = event => {
     koiTableBody = getKoiTableBody()
     paginationContainer = getPaginationContainer()
@@ -91,7 +88,7 @@ const termClickHandler = event => {
 
     self = event.currentTarget
     taxonomy = self.dataset.taxonomy
-    termId = self.dataset.termId
+    termId = self.id
 
     payload = {
         action: "filter_by_term",
@@ -119,16 +116,16 @@ const dragRowHandler = event => {
     event.dataTransfer.setDragImage(parentRow, -50, -50);
 }
 
-const inventoryDragEnterHandler = event => {
+const dragEnterHandler = event => {
     var self = event.currentTarget
     self.classList.add('hover')
 }
-const inventoryDragLeaveHandler = event => {
+const dragLeaveHandler = event => {
     var self = event.currentTarget
     self.classList.remove('hover')
 }
 
-const inventoryDragOverHandler = event => {
+const dragOverHandler = event => {
     event.preventDefault()
 }
 
@@ -159,10 +156,18 @@ const inventoryDropHandler = event => {
 
 const submitFilter = () => {
     koiTableBody = getKoiTableBody()
+    paginationContainer = getPaginationContainer()
+    activeFilterContainer = getActiveFilterContainer()
+
     let payload = {action: 'filter_koi_handler'}
     jQuery('.koi-pricing-table-filter input').each(function() {       
         payload[jQuery(this).attr('name')] = jQuery(this).val()
     })
+
+    jQuery('.koi-pricing-table-filter select').each(function() {       
+        payload[jQuery(this).attr('name')] = jQuery(this).val()
+    })
+
     showLoading()
     
     jQuery.ajax({
@@ -172,6 +177,8 @@ const submitFilter = () => {
         data : payload,
         success: function(response) {
             setHTMLContent(koiTableBody, response.data)
+            setHTMLContent(paginationContainer, response.pagination)
+            setHTMLContent(activeFilterContainer, response.active_filter)
         }
     })
 }
@@ -216,7 +223,24 @@ const triggerNotification = () => {
     }, 3000)
     
 }
+
+const submitAPIKey = event => {
+    consumerKey = document.getElementById("koi_plugin_setting_consumer_key").value
+    consumerSecret = document.getElementById("koi_plugin_setting_consumer_secret").value
+    console.log("Consumer Key : " + consumerKey)
+    console.log("Consumer Secret : " + consumerSecret)
+    // return false
+}
+
+
+
 const showLoading = () => {
     koiTableBody = getKoiTableBody()
     koiTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center"><img src="http://kkf.loc:8888/wp-content/uploads/2020/12/loading-icon.gif" style="height:200px"></td></tr>'
+}
+
+const setHTMLContent = (element, htmlContent) => {
+    htmlContent = (htmlContent === '') ? '<span style="padding: 10px">No Results</span>' : htmlContent
+    element.innerHTML = htmlContent
+    init_event_listeners()
 }

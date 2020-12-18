@@ -1,0 +1,97 @@
+.auction-reorder-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+  
+  /* Modal Content/Box */
+.auction-reorder-modal .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    max-width: 1194px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+.auction-reorder-modal .modal-header {
+    padding: 2px 16px;
+    background-color: #6c7ae0;
+    color: white;
+}
+.auction-reorder-modal .modal-footer {
+    padding: 10px 16px;
+    background-color: #6c7ae0;
+    color: white;
+    text-align: right;
+}
+.auction-reorder-modal .modal-header h2 {
+    color: #fff;
+}
+.auction-reorder-modal .modal-body {
+    padding: 2px 16px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.auction-reorder-modal .modal-body .item {
+    height: 200px;
+    margin: 8px 4px;
+    text-align: center;
+    flex: 0 0 10%;
+    box-shadow: 0px 0px 3px 0px #6c7ae0;
+}
+.auction-reorder-modal .modal-body .item img{
+    height: 80%;
+    width: 100%;
+}
+  /* The Close Button */
+.auction-reorder-modal .close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+  
+.auction-reorder-modal .close:hover,
+.auction-reorder-modal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auction-reorder-modal .modal-body .item:hover,
+.auction-reorder-modal .modal-body .item.hover
+{
+    box-shadow: 0px 0px 3px 3px #6c7ae0;
+}
+
+.reorder-success {
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    padding: 40px;
+}
+
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}

@@ -75,7 +75,7 @@ class KoiPricing {
             'label'                 => __( 'Inventory', 'inventory' ),
             'description'           => __( 'Inventory Description', 'inventory' ),
             'labels'                => $labels,
-            'supports'              => array( 'title', 'editor', 'thumbnail', 'comments', 'page-attributes', 'custom-fields' ),
+            'supports'              => array( 'title', 'editor', 'thumbnail', 'comments', 'custom-fields' ),
             'taxonomies'            => array( 'post_tag', 'breeder', 'variety', 'price_type', 'product_cat' ),
             'hierarchical'          => false,
             'public'                => true,
@@ -176,25 +176,40 @@ class KoiPricing {
 
     public static function get_tax_query() {
         $term_info = self::get_current_session_term();
-        return array(
-            array(
+        $tax_query = self::get_current_session_tax_filter();
+        if($term_info) {
+            $field = ($term_info['taxonomy'] == 'photo_groups') ? 'slug' : 'term_id';
+            $tax_query[] = [
                 'taxonomy' => $term_info['taxonomy'],
-                'field' => 'term_id',
-                'terms' => $term_info['term_id'],
-            )
-        );
+                'field' => $field,
+                'terms' => $term_info['term_id']
+            ];
+        }
+        if($tax_query) {
+            $tax_query['relation'] = 'OR';
+            return [                
+                $tax_query
+            ];
+        }
+        return false;
     }
 
     public static function get_max_num_page() {
-        $term_info = self::get_current_session_term();
+        $tax_query = self::get_tax_query();
+        $meta_query = self::get_current_session_filter();
+
         $args = array(
             'post_type' => KoiPricing::INV_POST_TYPE,
             'posts_per_page' => -1
         );
-
-        if($term_info) {
-            $args['tax_query'] = self::get_tax_query();
+        
+        if($tax_query) {
+            $args['tax_query'] = $tax_query;
         }
+
+        if ($meta_query) {
+            $args['meta_query'] = $meta_query;
+        }    
         
         $posts = new WP_Query($args);
 
@@ -202,30 +217,36 @@ class KoiPricing {
     }
 
     public static function get_inventory_collection($offset = 0, $page_size = 10) {
-        $term_info = self::get_current_session_term();
+        $tax_query = self::get_tax_query();
         $meta_query = self::get_current_session_filter();
         $args = array(
             'posts_per_page' => $page_size,
             'offset' => $offset,
             'post_type'   => KoiPricing::INV_POST_TYPE,
-            'fields' => 'ids'
+            'fields' => 'ids'            
         );
 
-        if($term_info) {
-            $args['tax_query'] = self::get_tax_query();
+        if($tax_query) {
+            $args['tax_query'] = $tax_query;
         }
 
         if ($meta_query) {
             $args['meta_query'] = $meta_query;
         }
-        
+
         return get_posts( $args );
     }
-    public static function get_taxonomy_terms($taxonomy) {
-        return get_terms( array(
+    public static function get_taxonomy_terms($taxonomy, $meta_query = []) {
+        $args = [
             'taxonomy' => $taxonomy,
             'hide_empty' => false
-        ) );
+        ];
+
+        if(count($meta_query)) {
+            $args['meta_query'] = $meta_query;
+        }
+
+        return get_terms($args);
     }
 
     public static function set_session_term($term_id, $taxonomy) {
@@ -235,6 +256,21 @@ class KoiPricing {
 
     public static function set_filter_session($meta_query) {        
         update_user_meta(get_current_user_id(), '_cur_meta_query', json_encode($meta_query));
+    }
+    public static function set_tax_filter_session($tax_query) {        
+        update_user_meta(get_current_user_id(), '_cur_tax_query', json_encode($tax_query));
+    }
+
+    public static function set_filter_request_session($request) {        
+        update_user_meta(get_current_user_id(), '_cur_request', json_encode($request));
+    }
+    
+    public static function get_current_session_filter_request() {
+        $request = get_user_meta(get_current_user_id(), '_cur_request', true);
+        if( $request ) {
+            return json_decode($request, true);
+        }
+        return false;
     }
 
     public static function get_current_session_term() {
@@ -249,6 +285,15 @@ class KoiPricing {
         }
         return false;
     }
+
+    public static function get_current_session_tax_filter() {
+        $tax_query = get_user_meta(get_current_user_id(), '_cur_tax_query', true);
+        if( $tax_query ) {
+            return json_decode($tax_query, true);
+        }
+        return false;
+    }
+
     public static function get_current_session_filter() {
         $meta_query = get_user_meta(get_current_user_id(), '_cur_meta_query', true);
         if( $meta_query ) {
@@ -257,23 +302,51 @@ class KoiPricing {
         return false;
     }
 
-    public static function reset_session() {        
+    public static function unset_session_term() {
+        delete_user_meta(get_current_user_id(), '_cur_term_id');
+        delete_user_meta(get_current_user_id(), '_cur_taxonomy');
+    }
+    
+    public static function reset_session() {
         delete_user_meta(get_current_user_id(), '_cur_term_id');
         delete_user_meta(get_current_user_id(), '_cur_taxonomy');
         delete_user_meta(get_current_user_id(), '_cur_meta_query');
+        delete_user_meta(get_current_user_id(), '_cur_tax_query');
+        delete_user_meta(get_current_user_id(), '_cur_request');
     }
 
     public static function get_term_name_by_id($term_id) {
         return get_term( $term_id )->name;
     }
 
+    public static function get_term_name_by_slug($slug) {
+        return get_term_by('slug', $slug, 'photo_groups')->name;
+    }
+
     public static function get_taxonomy_name_by_slug($slug) {
         $taxonomies = [
             'auction_groups' => 'Auction Group',
-            'photo_groups' => 'Photo Group'
+            'photo_groups' => 'Photo Group',
+            'breeder' => 'Breeder',
+            'variety' => 'Variety',
+            'product_cat' => 'Product Category'
         ];
         return $taxonomies[$slug];
     }
 
-    
+    public static function get_inventory_thumbnail_src($post_id) {
+        $images = get_children( array (
+            'post_parent' => $post_id,
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image'
+        ));
+
+        if ( empty($images) ) {
+            return false;
+        } else {
+            foreach ( $images as $attachment_id => $attachment ) {
+                return wp_get_attachment_image_src( $attachment_id, 'medium' );
+            }
+        }
+    }    
 }

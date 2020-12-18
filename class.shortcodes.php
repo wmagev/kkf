@@ -13,7 +13,8 @@ class KoiShortcodes {
         add_shortcode( 'koi-table-filter-form', array( 'KoiShortcodes', 'render_koi_filter_form' ) );
         add_shortcode( 'koi-thumbnail-lightbox', array( 'KoiShortcodes', 'render_lightbox' ) );
         add_shortcode( 'koi-table-pagination', array( 'KoiShortcodes', 'render_pagination' ) );
-        add_shortcode( 'active-filter-info', array( 'KoiShortcodes', 'render_active_filter' ) );        
+        add_shortcode( 'active-filter-info', array( 'KoiShortcodes', 'render_active_filter' ) );
+        add_shortcode( 'koi-reorder-auction', array( 'KoiShortcodes', 'render_auction_reorder_modal' ) );
     }
 
     public static function get_term_info($post, $taxonomy) {
@@ -36,93 +37,166 @@ class KoiShortcodes {
 
         return $auction_date;
     }
-    
+
+    public static function render_auction_reorder_modal() {
+        return '
+            <div id="auction-reorder-modal" class="auction-reorder-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="auction-reorder-close close">&times;</span>
+                        <h2 id="auction-group-header">Modal Header</h2>
+                    </div>                
+                    <div class="modal-body auction-reorder-body">
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button class="button reorder-submit">
+                            Save Order
+                        </button>
+                    </div>
+                </div>            
+            </div>
+        ';
+    }    
 
     public static function render_active_filter() {
         $html = 'Active Filters: ';
-
-        $term_info = KoiPricing::get_current_session_term();
-        if($term_info) {
-            $html .= '<span class="filter-field">Term: </span><span class="filter-value" >'.KoiPricing::get_term_name_by_id($term_info['term_id']).'</span>';
-            $html .= '<span class="filter-field">Taxonomy: </span><span class="filter-value" >'.KoiPricing::get_taxonomy_name_by_slug($term_info['taxonomy']).'</span>';
+        
+        $tax_query = KoiPricing::get_tax_query();
+        $meta_query = KoiPricing::get_current_session_filter();
+        
+        if($tax_query) {
+            foreach($tax_query[0] as $term) {
+                if($term === 'OR') continue;
+                if($term['taxonomy'] == 'photo_groups') {
+                    $term_name = KoiPricing::get_term_name_by_slug($term['terms']);
+                }
+                else {
+                    $term_name = KoiPricing::get_term_name_by_id($term['terms']);
+                }
+                
+                $html .= '<span class="filter-field-wrapper">';
+                $html .= '<span class="filter-field">Term: </span><span class="filter-value" >'.$term_name.'</span>';
+                $html .= '<span class="filter-field">Taxonomy: </span><span class="filter-value" >'.KoiPricing::get_taxonomy_name_by_slug($term['taxonomy']).'</span>';
+                $html .= '</span>';                
+            }
         }
 
+        if($meta_query) {
+            foreach($meta_query as $meta) {
+                $html .= '<span class="filter-field-wrapper">';
+                $html .= '<span class="filter-field">Meta Key: </span><span class="filter-value" >'.KoiPricing_Admin::get_meta_lable_by_key($meta['key']).'</span>';
+                $html .= '<span class="filter-field">Meta Value: </span><span class="filter-value" >'.$meta['value'].'</span>';
+                $html .= '</span>';                
+            }
+        }
+        
         $html .= '<span id="refresh-filter" class="refresh-filter"><i class="fa fa-remove"></i></span>';
         return $html;
     }
 
     public static function render_koi_filter_form() {
+        $varieties = KoiPricing::get_taxonomy_terms('variety');
+        $categories = KoiPricing::get_taxonomy_terms('product_cat');
+        $breeders = KoiPricing::get_taxonomy_terms('breeder');
+        $request = KoiPricing::get_current_session_filter_request();
+        error_log(print_r($request, true));
+
+        $breederOptions = '<option value=""></option>';
+        foreach($breeders as $term) {
+            $selected = ($term->term_id == $request['breeder']) ? 'selected' : '';            
+            $breederOptions .= '<option '.$selected.' value="'.$term->term_id.'">'.$term->name.'</option>';
+        }
+
+        $categoryOptions = '<option value=""></option>';
+        foreach($categories as $term) {
+            $selected = ($term->term_id == $request['product-category']) ? 'selected' : '';
+            $categoryOptions .= '<option '.$selected.' value="'.$term->term_id.'">'.$term->name.'</option>';
+        }
+
+        $varietyOptions = '<option value=""></option>';
+        foreach($varieties as $term) {
+            error_log('variety -> '.$request['variety'].' ? '.$term->term_id.' = '.$selected);
+            $selected = ($term->term_id == $request['variety']) ? 'selected' : '';
+            $varietyOptions .= '<option '.$selected.' value="'.$term->term_id.'">'.$term->name.'</option>';
+        }
         return '<div class="koi-pricing-table-filter">
             <h2>Koi Filter</h2>
             <div class="input-wrapper first">
                 <label for="auction-start">Auction Start: </label>     
                 <div class="input-box">                   
-                    <input name="auction-start" class="datepicker" />
+                    <input name="auction-start" class="datepicker" value="'.$request['auction-start'].'" />
                     <span class="focus-border"></span>                        
                 </div>
             
                 <label for="auction-start">Auction End: </label>
                 <div class="input-box">
-                    <input name="auction-end" class="datepicker" />
+                    <input name="auction-end" class="datepicker" value="'.$request['auction-end'].'" />
                     <span class="focus-border"></span>
                 </div>
                 <label for="auction-start">Born In: </label>
                 <div class="input-box">
-                    <input name="born-in" />
+                    <input name="born-in" value="'.$request['born-in'].'" />
                     <span class="focus-border"></span>
                 </div>
             </div>
             <div class="input-wrapper">
-                <label for="auction-start">From Pond: </label>
+                <label for="from-pond">From Pond: </label>
                 <div class="input-box">
-                    <input name="from-pond" />
+                    <input name="from-pond" value="'.$request['from-pond'].'" />
                     <span class="focus-border"></span>
                 </div>
-                <label for="auction-start">To Pond: </label>
+                <label for="to-pond">To Pond: </label>
                 <div class="input-box">
-                    <input name="to-pond" />
+                    <input name="to-pond" value="'.$request['to-pond'].'" />
                     <span class="focus-border"></span>
                 </div>
             </div>
             <div class="input-wrapper">                
                 <label for="koi-status">Status: </label>     
                 <div class="input-box">                   
-                    <input name="koi-status" />
+                    <input name="koi-status" value="'.$request['koi-status'].'" />
                     <span class="focus-border"></span>                        
                 </div>
             
                 <label for="variety">Variety: </label>
-                <div class="input-box">
-                    <input name="variety" />
+                <div class="input-box">                    
+                    <select name="variety" id="variety">
+                        '.$varietyOptions.'
+                    </select>
                     <span class="focus-border"></span>
                 </div>
                 <label for="Breeder">Breeder: </label>
                 <div class="input-box">
-                    <input name="breeder" />
+                    <select name="breeder" id="breeder">
+                        '.$breederOptions.'
+                    </select>
                     <span class="focus-border"></span>
                 </div>                    
             </div>
             <div class="input-wrapper">
                 <label for="product-category">Product Category: </label>
-                <div class="input-box">
-                    <input name="product-category" />
+                <div class="input-box">                    
+                    <select name="product-category" id="product-category">
+                        '.$categoryOptions.'
+                    </select>
                     <span class="focus-border"></span>
                 </div>
                 <label for="koi-price">Price: </label>
                 <div class="input-box">
-                    <input name="koi-price" />
+                    <input name="koi-price" value="'.$request['koi-price'].'" />
                     <span class="focus-border"></span>
                 </div>                    
             </div>
             <div class="input-wrapper">
                 <label for="auction-group">Auction Group: </label>
                 <div class="input-box">
-                    <input name="auction-group" />
+                    <input disabled name="auction-group" value="'.$request['auction-group'].'" />
                     <span class="focus-border"></span>
                 </div>
                 <label for="photo-group">Photo Group: </label>
                 <div class="input-box">
-                    <input name="photo-group" class="datepicker" />
+                    <input name="photo-group" class="datepicker" value="'.$request['photo-group'].'" />
                     <span class="focus-border"></span>
                 </div>
             </div>            
@@ -163,11 +237,9 @@ class KoiShortcodes {
         $photo_group = self::get_term_info($inventory, 'photo_groups');
 
         $auction_start_date = self::get_auction_date($inventory, KoiPricing::TERM_START_DATE);
-        $auction_end_date = self::get_auction_date($inventory, KoiPricing::TERM_END_DATE);
-        // $thumbnails = get_the_post_thumbnail($inventory, array( 150, 150 ) );
+        $auction_end_date = self::get_auction_date($inventory, KoiPricing::TERM_END_DATE);        
         $thumbnails = self::get_inventory_thumbnails($inventory->ID);
-
-        error_log(print_r($inventory, true));
+        
         return '
             <tr>
                 <td class="drag-n-drop"><i draggable="true" class="fas fa-arrows-alt draggable-icon" id="'.$inventory->ID.'"></i></td>
@@ -200,10 +272,6 @@ class KoiShortcodes {
                         <tr>
                             <td>Size (cm):</td>
                             <td>'.get_post_meta($id, '_inventory_size', true).'</td>
-                        </tr>
-                        <tr>
-                            <td>Menu Order:</td>
-                            <td>'.$inventory->menu_order.'</td>
                         </tr>
                     </table>
                 </td>
@@ -316,7 +384,7 @@ class KoiShortcodes {
                     'data-large_image_width'  => $full_size_image[1],
                     'data-large_image_height' => $full_size_image[2],
                 );
-                $size = ($index === 1) ? [ 150, 150 ] : [ 50, 50 ];
+                $size = ($index === 1) ? [ 185, 300 ] : [ 50, 80 ];
                 $html .= '<div data-index="'.$index.'" data-thumb="' . esc_url( $thumbnail[0] ) . '" class="koi-thumbnails">';
                 $html .= wp_get_attachment_image( $attachment_id, $size, false, $attributes );
                 $html .= '</div>';
@@ -324,7 +392,7 @@ class KoiShortcodes {
                 $index ++;
             }
             return $html;
-        }        
+        }
     }
 }
 

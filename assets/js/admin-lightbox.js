@@ -1,11 +1,15 @@
 var slideIndex = 1;
 
-const init_event_listeners = () => {    
-    init_lightbox_events()
-    init_dragndrop()
-    init_accordion()
-    init_pagination()
-    init_refresh_filter()
+const init_event_listeners = () => {
+    url = window.location.href
+    if(url.indexOf("koi-pricing") !== -1 && url.indexOf("koi-pricing-setting") === -1) {
+        init_lightbox_events()
+        init_dragndrop()
+        init_accordion()
+        init_pagination()
+        init_refresh_filter()
+        init_reorder_auction()
+    }
 }
 const init_lightbox_events = () => {
     const prevButton = document.getElementsByClassName("lightbox-prev")[0]
